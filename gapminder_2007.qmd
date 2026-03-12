@@ -1,36 +1,29 @@
 ---
 title: "GAPMINDER | LIFE EXPECTANCIES 2007"  
-format: dashboard   
+format: dashboard
+execute:
+    echo: false
 ---
 
 ```{python}
 import pandas as pd
 import plotly.express as px
 import itables
-import nbformat
-from nbclient import NotebookClient
 
-# Load the data
 gap = px.data.gapminder()
-
-# Filter for year 2007
 gap_07 = gap.query("year == 2007")
 
-# Compute highest life expectancy
 highest_row = gap_07.sort_values("lifeExp", ascending=False).head(1).squeeze()
 highest_life_exp_country = highest_row["country"]
 highest_life_exp_value = round(highest_row["lifeExp"], 1)
 
-# Compute lowest life expectancy
 lowest_row = gap_07.sort_values("lifeExp", ascending=True).head(1).squeeze()
 lowest_life_exp_country = lowest_row["country"]
 lowest_life_exp_value = round(lowest_row["lifeExp"], 1)
 
-# Compute average (population-weighted) life expectancy
 weighted_mean = (gap_07["lifeExp"] * gap_07["pop"]).sum() / gap_07["pop"].sum()
 average_life_exp_value = round(weighted_mean, 1)
 
-# Create the map using plotly express with a blue color scale
 map_fig = px.choropleth(
     gap_07,
     locations="iso_alpha",
@@ -40,7 +33,6 @@ map_fig = px.choropleth(
     color_continuous_scale="Blues",
 ).update_layout(coloraxis_showscale=False)
 
-# Largest 20 countries by Life Expectancy (bar chart) with a blue color scale
 top_20 = gap_07.nlargest(20, "pop").sort_values("lifeExp", ascending=True)
 bar_fig = px.bar(
     top_20,
@@ -87,7 +79,7 @@ bar_fig = px.bar(
 map_fig
 ```
 
-### {width=40%}
+### {width=30%}
 
 ```{python}
 bar_fig
@@ -95,10 +87,9 @@ bar_fig
 
 # REGIONAL
 
-## Row 1 {height=30%}
+## Row 1 {height=40%}
 
 ```{python}
-# Create regional summary
 reg_sum = (
     gap_07.groupby("continent")
     .apply(
@@ -120,7 +111,7 @@ reg_sum = (
 itables.show(reg_sum)
 ```
 
-## Row 2 {height=70%}
+## Row 2 {height=60%}
 
 ### Column {width="80%"}
 
@@ -131,9 +122,9 @@ continent_fig = px.box(
     y="lifeExp",
     color="continent",
     title="Distribution of Life Expectancy by Continent",
-    points="all",  # This shows all data points
-    hover_data=["country"],  # This adds country names to hover info
-    color_discrete_sequence=px.colors.sequential.Turbo,  # Built-in Blues palette
+    points="all", 
+    hover_data=["country"], 
+    color_discrete_sequence=px.colors.sequential.Turbo,  
 ).update_layout(
     showlegend=False, xaxis_title="Continent", yaxis_title="Life Expectancy (years)"
 )
@@ -141,7 +132,7 @@ continent_fig = px.box(
 continent_fig
 ```
 
-### Column {width="20%"}
+### Notes {width="20%"}
 
 Africa shows markedly lower life expectancy figures compared to other continents, reflecting significant developmental challenges.
 
@@ -150,7 +141,6 @@ Europe and Oceania demonstrate the most consistently high life expectancies, whi
 # DATA DOWNLOAD
 
 ```{python}
-# Display full dataset with itables
 itables.show(gap_07, caption="Gapminder Dataset (2007)", buttons=["csvHtml5"])
 ```
 
